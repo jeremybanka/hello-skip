@@ -1,0 +1,27 @@
+{
+	"editor.wordSeparators": "./\\()\"'-:,.;<>~!@#%^&*|+=[]{}`~?",
+	"cSpell.words": [
+		"metafile",
+		"Ollama",
+		"openai",
+		"safegen",
+		"treeshake",
+		"tsup"
+	],
+	"json.schemas": [
+		{
+			"fileMatch": ["**/break-check.config.json"],
+			"url": "https://unpkg.com/break-check@0.6.2/dist/break-check.schema.json"
+		}
+	],
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"[json][jsonc][typescript][typescriptreact][css]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit"
+	},
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"coverage-gutters.coverageBaseDir": "**/coverage/"
+}

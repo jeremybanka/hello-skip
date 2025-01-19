@@ -1,0 +1,10 @@
+{
+	"recommendations": [
+		"kuscamara.remove-unused-imports",
+		"streetsidesoftware.code-spell-checker",
+		"tyriar.sort-lines",
+		"yoavbls.pretty-ts-errors",
+		"esbenp.prettier-vscode",
+		"oven.bun-vscode"
+	]
+}
