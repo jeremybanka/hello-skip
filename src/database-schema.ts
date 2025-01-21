@@ -20,11 +20,17 @@ export const users = pgTable(
 		return [uniqueIndex("nameIdx").on(col.name)];
 	},
 );
+export const usersRelations = relations(users, ({ many }) => ({
+	userGroups: many(userGroups),
+}));
 
 export const groups = pgTable("groups", {
 	id: uuid().primaryKey().defaultRandom().$type<GroupID>(),
 	name: varchar({ length: 256 }),
 });
+export const groupsRelations = relations(groups, ({ many }) => ({
+	userGroups: many(userGroups),
+}));
 
 export const userGroups = pgTable(
 	"userGroups",
@@ -38,37 +44,45 @@ export const userGroups = pgTable(
 	},
 	(t) => [{ pk: primaryKey({ columns: [t.userId, t.groupId] }) }],
 );
-
-export const usersRelations = relations(users, ({ many }) => ({
-	friends: many(userFriends),
+export const userGroupsRelations = relations(userGroups, ({ one }) => ({
+	group: one(groups, {
+		fields: [userGroups.groupId],
+		references: [groups.id],
+	}),
+	user: one(users, {
+		fields: [userGroups.userId],
+		references: [users.id],
+	}),
 }));
 
-export const userFriends = pgTable(
-	"userFriends",
+export const leaderFollowers = pgTable(
+	"leaderFollowers",
 	{
-		userId: uuid()
-			.notNull()
+		leaderId: uuid()
+			.$type<UserID>()
 			.references(() => users.id),
-		friendId: uuid()
-			.notNull()
+		followerId: uuid()
+			.$type<UserID>()
 			.references(() => users.id),
 	},
 	(t) => [
-		{ pk: primaryKey({ columns: [t.userId, t.friendId] }) },
-		uniqueIndex("friendship").on(
-			gt(t.userId, t.friendId),
-			lt(t.userId, t.friendId),
-		),
+		{
+			pk: primaryKey({ columns: [t.leaderId, t.followerId] }),
+			unique: uniqueIndex("userIdFollowerIdIdx").on(t.leaderId, t.followerId),
+		},
 	],
 );
 
-export const usersToFriendsRelations = relations(userFriends, ({ one }) => ({
-	user: one(users, {
-		fields: [userFriends.userId],
-		references: [users.id],
+export const leaderFollowersRelations = relations(
+	leaderFollowers,
+	({ one }) => ({
+		leader: one(users, {
+			fields: [leaderFollowers.leaderId],
+			references: [users.id],
+		}),
+		follower: one(users, {
+			fields: [leaderFollowers.followerId],
+			references: [users.id],
+		}),
 	}),
-	friend: one(users, {
-		fields: [userFriends.friendId],
-		references: [users.id],
-	}),
-}));
+);

@@ -19,6 +19,10 @@
 	"[json][jsonc][typescript][typescriptreact][css]": {
 		"editor.defaultFormatter": "biomejs.biome"
 	},
+	"files.associations": {
+		"tsconfig.json": "jsonc",
+		".env.*": "properties"
+	},
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit"
 	},

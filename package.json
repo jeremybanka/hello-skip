@@ -1,18 +1,27 @@
 {
 	"scripts": {
-		"test": "vitest"
+		"test": "vitest",
+		"env:dev": "[ -f .env.development ] && echo '.env.development already present' || cp .env.defaults .env.development",
+		"db:dev": "bun env:dev && dotenv -e .env.development -- ./__scripts__/interactive-db.bun.ts",
+		"db:gen": "bun env:dev && dotenv -e .env.development -- drizzle-kit generate",
+		"db:nuke": "./__scripts__/destroy-db.bun.ts",
+		"db:setup": "./__scripts__/setup-db.bun.ts"
 	},
 	"dependencies": {
-		"@skipruntime/api": "^0.0.6",
-		"@skipruntime/helpers": "^0.0.8",
-		"@skipruntime/server": "^0.0.8",
-		"drizzle-kit": "^0.30.2",
-		"drizzle-orm": "^0.38.4",
-		"postgres": "^3.4.5"
+		"@skipruntime/api": "0.0.6",
+		"@skipruntime/helpers": "0.0.8",
+		"@skipruntime/server": "0.0.8",
+		"@t3-oss/env-core": "0.11.1",
+		"drizzle-kit": "0.30.2",
+		"drizzle-orm": "0.38.4",
+		"postgres": "3.4.5",
+		"zod": "3.24.1"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/node": "22.10.7",
+		"bun-types": "1.1.45",
+		"dotenv-cli": "8.0.0",
 		"typescript": "5.7.3",
 		"vitest": "3.0.2"
 	}
