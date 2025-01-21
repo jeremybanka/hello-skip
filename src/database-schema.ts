@@ -22,6 +22,12 @@ export const users = pgTable(
 );
 export const usersRelations = relations(users, ({ many }) => ({
 	userGroups: many(userGroups),
+	leaders: many(leaderFollowers, {
+		relationName: "leader",
+	}),
+	followers: many(leaderFollowers, {
+		relationName: "follower",
+	}),
 }));
 
 export const groups = pgTable("groups", {
@@ -79,10 +85,12 @@ export const leaderFollowersRelations = relations(
 		leader: one(users, {
 			fields: [leaderFollowers.leaderId],
 			references: [users.id],
+			relationName: "leader",
 		}),
 		follower: one(users, {
 			fields: [leaderFollowers.followerId],
 			references: [users.id],
+			relationName: "follower",
 		}),
 	}),
 );

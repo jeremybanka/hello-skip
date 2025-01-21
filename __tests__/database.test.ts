@@ -1,8 +1,11 @@
 import { DatabaseManager, type Empty } from "../src/database";
 import * as schema from "../src/database-schema";
-import * as DK from "drizzle-kit";
 import { setupDatabase } from "../src/setup-db";
 import type { Options } from "postgres";
+import { randomUUID } from "node:crypto";
+import { eq } from "drizzle-orm";
+import type { UserID } from "../src/main";
+import { inspect } from "node:util";
 
 const pgOptions = {
 	user: "postgres",
@@ -23,35 +26,39 @@ const dbManager = new DatabaseManager(
 beforeEach(async () => {
 	console.log("🗃️ Setting up database");
 	await setupDatabase(pgOptions);
-	await dbManager.drizzle
-		.insert(schema.users)
-		.values([{ name: "User 1", active: true }]);
-	await dbManager.drizzle.insert(schema.groups).values([{ name: "Group 1" }]);
 });
 
 afterEach(async () => {
-	// console.log("🗃️ Dropping sample tables");
-	// await dbManager.dropSampleTables();
 	console.log("🗃️ Dropping database");
 	await dbManager.dropDatabase();
 });
 
 describe("Database", () => {
 	it("should query data", async () => {
-		const [user] = await dbManager.drizzle.query.users.findMany({
+		const id0 = randomUUID();
+		const id1 = randomUUID();
+		await dbManager.drizzle.insert(schema.users).values([
+			{ id: id0, name: "Frog", active: true },
+			{ id: id1, name: "Toad", active: true },
+		]);
+		await dbManager.drizzle.insert(schema.leaderFollowers).values([
+			{ leaderId: id0, followerId: id1 },
+			{ leaderId: id1, followerId: id0 },
+		]);
+		await dbManager.drizzle.insert(schema.groups).values([{ name: "Group 1" }]);
+
+		const users = await dbManager.drizzle.query.users.findFirst({
+			where: eq(schema.users.id, id0 as UserID),
 			with: {
-				userGroups: {
+				leaders: {
+					where: (users, { eq }) => eq(users.leaderId, id0),
 					with: {
-						group: {
-							columns: {
-								name: true,
-							},
-						},
+						follower: true,
 					},
 				},
 			},
 		});
-		console.log(user.userGroups[0]);
-		expect(user).toBeDefined();
+		console.log(inspect(users, { depth: Number.POSITIVE_INFINITY }));
+		expect(users).toBeDefined();
 	});
 });
